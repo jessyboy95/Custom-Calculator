@@ -1,1 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: flex-start;
+            max-width: 1200px;
+        }
+
+        .info-panels {
+            display: flex;
+            gap: 20px;
+            flex-direction: column;
+            min-width: 250px;
+        }
+
+        .info-panel {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .info-panel h3 {
+            color: #667eea;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        .temperature {
+            font-size: 28px;
+            font-weight: bold;
+            color: #764ba2;
+            margin-bottom: 5px;
+        }
+
+        .datetime {
+            font-size: 20px;
+            font-weight: bold;
+            color: #667eea;
+            line-height: 1.5;
+        }
+
+        .calculator {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            min-width: 350px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .tab-btn {
+            padding: 10px 15px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: #999;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-btn:hover {
+            color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .display {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 32px;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: right;
+            margin-bottom: 20px;
+            word-wrap: break-word;
+            word-break: break-all;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+        .buttons-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 15px;
+            font-size: 18px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-number {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .btn-number:hover {
+            background: #efefef;
+            transform: scale(1.05);
+        }
+
+        .btn-operator {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-operator:hover {
+            background: #5568d3;
+            transform: scale(1.05);
+        }
+
+        .btn-equals {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            grid-column: span 2;
+        }
+
+        .btn-equals:hover {
+            transform: scale(1.05);
+        }
+
+        .btn-clear {
+            background: #ff6b6b;
+            color: white;
+            grid-column: span 2;
+        }
+
+        .btn-clear:hover {
+            background: #ff5252;
+            transform: scale(1.05);
+        }
+
+        .unit-conversion {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .unit-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .unit-group label {
+            font-weight: 600;
+            color: #333;
+            font-size: 13px;
+            text-transform: uppercase;
+            color: #667eea;
+        }
+
+        .unit-group input,
+        .unit-group select {
+            padding: 10px;
+            border: 2px solid #eee;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border 0.3s;
+        }
+
+        .unit-group input:focus,
+        .unit-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .conversion-result {
+            grid-column: span 2;
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 600;
+            color: #764ba2;
+        }
+
+        .buttons-grid-units {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .preset-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+
+        .preset-section h4 {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .preset-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .preset-buttons button {
+            padding: 10px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Info Panels -->
+        <div class="info-panels">
+            <!-- Temperature Panel -->
+            <div class="info-panel">
+                <h3>🌡️ Temperature</h3>
+                <div class="temperature" id="temperature">--°C</div>
+            </div>
+
+            <!-- Date & Time Panel -->
+            <div class="info-panel">
+                <h3>📅 Date & Time</h3>
+                <div class="datetime">
+                    <div id="date">Loading...</div>
+                    <div id="time">Loading...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calculator -->
+        <div class="calculator">
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('basic')">Basic</button>
+                <button class="tab-btn" onclick="switchTab('units')">Units</button>
+                <button class="tab-btn" onclick="switchTab('gaming')">Gaming</button>
+            </div>
+
+            <!-- Basic Calculator Tab -->
+            <div id="basic" class="tab-content active">
+                <div class="display" id="display">0</div>
+                <div class="buttons-grid">
+                    <button class="btn-clear" onclick="clearDisplay()">AC</button>
+                    <button class="btn-operator" onclick="appendOperator('/')">÷</button>
+                    <button class="btn-operator" onclick="appendOperator('*')">×</button>
+                    
+                    <button class="btn-number" onclick="appendNumber('7')">7</button>
+                    <button class="btn-number" onclick="appendNumber('8')">8</button>
+                    <button class="btn-number" onclick="appendNumber('9')">9</button>
+                    <button class="btn-operator" onclick="appendOperator('-')">−</button>
+                    
+                    <button class="btn-number" onclick="appendNumber('4')">4</button>
+                    <button class="btn-number" onclick="appendNumber('5')">5</button>
+                    <button class="btn-number" onclick="appendNumber('6')">6</button>
+                    <button class="btn-operator" onclick="appendOperator('+')">+</button>
+                    
+                    <button class="btn-number" onclick="appendNumber('1')">1</button>
+                    <button class="btn-number" onclick="appendNumber('2')">2</button>
+                    <button class="btn-number" onclick="appendNumber('3')">3</button>
+                    <button class="btn-operator" onclick="toggleSign()">±</button>
+                    
+                    <button class="btn-number" onclick="appendNumber('0')" style="grid-column: span 2;">0</button>
+                    <button class="btn-number" onclick="appendNumber('.')">.</button>
+                    <button class="btn-equals" onclick="calculate()">=</button>
+                </div>
+                <div class="preset-section">
+                    <h4>Scientific Functions</h4>
+                    <div class="preset-buttons">
+                        <button class="btn-operator" onclick="appendFunction('sqrt')">√</button>
+                        <button class="btn-operator" onclick="appendFunction('pow2')">x²</button>
+                        <button class="btn-operator" onclick="appendFunction('pow3')">x³</button>
+                        <button class="btn-operator" onclick="appendFunction('percent')">%</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Unit Conversion Tab -->
+            <div id="units" class="tab-content">
+                <div class="unit-conversion">
+                    <div class="unit-group">
+                        <label>From</label>
+                        <input type="number" id="unitInput" placeholder="Enter value" oninput="convertUnits()">
+                    </div>
+                    <div class="unit-group">
+                        <label>Unit</label>
+                        <select id="unitType" onchange="convertUnits()">
+                            <optgroup label="Distance">
+                                <option value="m-km">Meters → Kilometers</option>
+                                <option value="km-m">Kilometers → Meters</option>
+                                <option value="m-mi">Meters → Miles</option>
+                                <option value="mi-m">Miles → Meters</option>
+                                <option value="cm-in">Centimeters → Inches</option>
+                                <option value="in-cm">Inches → Centimeters</option>
+                            </optgroup>
+                            <optgroup label="Weight">
+                                <option value="kg-lb">Kilograms → Pounds</option>
+                                <option value="lb-kg">Pounds → Kilograms</option>
+                                <option value="g-oz">Grams → Ounces</option>
+                                <option value="oz-g">Ounces → Grams</option>
+                            </optgroup>
+                            <optgroup label="Temperature">
+                                <option value="c-f">Celsius → Fahrenheit</option>
+                                <option value="f-c">Fahrenheit → Celsius</option>
+                                <option value="c-k">Celsius → Kelvin</option>
+                                <option value="k-c">Kelvin → Celsius</option>
+                            </optgroup>
+                            <optgroup label="Volume">
+                                <option value="l-gal">Liters → Gallons</option>
+                                <option value="gal-l">Gallons → Liters</option>
+                                <option value="ml-fl">Milliliters → Fluid Ounces</option>
+                                <option value="fl-ml">Fluid Ounces → Milliliters</option>
+                            </optgroup>
+                            <optgroup label="Speed">
+                                <option value="mps-kmh">m/s → km/h</option>
+                                <option value="kmh-mps">km/h → m/s</option>
+                                <option value="kmh-mph">km/h → mph</option>
+                                <option value="mph-kmh">mph → km/h</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                </div>
+                <div class="conversion-result" id="conversionResult">Enter a value to convert</div>
+            </div>
+
+            <!-- Gaming Units Tab -->
+            <div id="gaming" class="tab-content">
+                <div class="preset-section">
+                    <h4>Minecraft</h4>
+                    <div class="unit-conversion">
+                        <div class="unit-group">
+                            <label>Blocks</label>
+                            <input type="number" id="mcBlocks" placeholder="Enter blocks" oninput="convertMinecraft()">
+                        </div>
+                        <div class="unit-group">
+                            <label>Meter Equivalent</label>
+                            <div class="conversion-result" id="mcResult">0 meters</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="preset-section">
+                    <h4>DnD/RPG</h4>
+                    <div class="unit-conversion">
+                        <div class="unit-group">
+                            <label>Feet</label>
+                            <input type="number" id="dndFeet" placeholder="Enter feet" oninput="convertDnD()">
+                        </div>
+                        <div class="unit-group">
+                            <label>Game Squares</label>
+                            <div class="conversion-result" id="dndResult">0 squares</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="preset-section">
+                    <h4>Game Stats Calculator</h4>
+                    <div class="unit-conversion">
+                        <div class="unit-group">
+                            <label>Base Damage</label>
+                            <input type="number" id="baseDamage" placeholder="Enter damage" oninput="calculateDamage()">
+                        </div>
+                        <div class="unit-group">
+                            <label>Multiplier/Crit</label>
+                            <input type="number" id="damageMultiplier" placeholder="e.g. 1.5" oninput="calculateDamage()">
+                        </div>
+                        <div class="conversion-result" id="damageResult">0 total damage</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let display = '0';
+        let previousValue = '';
+        let operation = null;
+        let shouldResetDisplay = false;
+
+        // Update Date and Time
+        function updateDateTime() {
+            const now = new Date();
+            
+            const dateOptions = { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' };
+            const dateStr = now.toLocaleDateString('en-US', dateOptions);
+            
+            const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+            const timeStr = now.toLocaleTimeString('en-US', timeOptions);
+            
+            document.getElementById('date').textContent = dateStr;
+            document.getElementById('time').textContent = timeStr;
+        }
+
+        // Update Temperature (simulated - can be replaced with real API)
+        function updateTemperature() {
+            const temp = Math.round(Math.random() * 35 - 5); // Random temp between -5 and 30
+            document.getElementById('temperature').textContent = temp + '°C';
+        }
+
+        // Calculator Functions
+        function updateDisplay() {
+            document.getElementById('display').textContent = display || '0';
+        }
+
+        function appendNumber(num) {
+            if (shouldResetDisplay) {
+                display = num;
+                shouldResetDisplay = false;
+            } else {
+                if (display === '0' && num !== '.') {
+                    display = num;
+                } else if (num === '.' && display.includes('.')) {
+                    return;
+                } else {
+                    display += num;
+                }
+            }
+            updateDisplay();
+        }
+
+        function appendOperator(op) {
+            if (operation !== null && !shouldResetDisplay) {
+                calculate();
+            }
+            previousValue = display;
+            operation = op;
+            shouldResetDisplay = true;
+        }
+
+        function appendFunction(func) {
+            const value = parseFloat(display);
+            let result;
+            
+            switch(func) {
+                case 'sqrt':
+                    result = Math.sqrt(value);
+                    break;
+                case 'pow2':
+                    result = value * value;
+                    break;
+                case 'pow3':
+                    result = value * value * value;
+                    break;
+                case 'percent':
+                    result = value / 100;
+                    break;
+            }
+            
+            display = result.toString();
+            updateDisplay();
+        }
+
+        function toggleSign() {
+            const value = parseFloat(display);
+            display = (value * -1).toString();
+            updateDisplay();
+        }
+
+        function calculate() {
+            if (operation === null || shouldResetDisplay) return;
+            
+            const prev = parseFloat(previousValue);
+            const current = parseFloat(display);
+            let result;
+            
+            switch(operation) {
+                case '+':
+                    result = prev + current;
+                    break;
+                case '-':
+                    result = prev - current;
+                    break;
+                case '*':
+                    result = prev * current;
+                    break;
+                case '/':
+                    result = current !== 0 ? prev / current : 0;
+                    break;
+                default:
+                    return;
+            }
+            
+            display = result.toString();
+            operation = null;
+            shouldResetDisplay = true;
+            updateDisplay();
+        }
+
+        function clearDisplay() {
+            display = '0';
+            previousValue = '';
+            operation = null;
+            shouldResetDisplay = false;
+            updateDisplay();
+        }
+
+        // Tab Switching
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Unit Conversion
+        function convertUnits() {
+            const input = parseFloat(document.getElementById('unitInput').value);
+            const type = document.getElementById('unitType').value;
+            let result;
+            
+            if (isNaN(input)) {
+                document.getElementById('conversionResult').textContent = 'Enter a value to convert';
+                return;
+            }
+            
+            const conversions = {
+                'm-km': { value: input / 1000, unit: 'km' },
+                'km-m': { value: input * 1000, unit: 'm' },
+                'm-mi': { value: input * 0.000621371, unit: 'miles' },
+                'mi-m': { value: input / 0.000621371, unit: 'm' },
+                'cm-in': { value: input / 2.54, unit: 'inches' },
+                'in-cm': { value: input * 2.54, unit: 'cm' },
+                'kg-lb': { value: input * 2.20462, unit: 'lbs' },
+                'lb-kg': { value: input / 2.20462, unit: 'kg' },
+                'g-oz': { value: input * 0.035274, unit: 'oz' },
+                'oz-g': { value: input / 0.035274, unit: 'g' },
+                'c-f': { value: (input * 9/5) + 32, unit: '°F' },
+                'f-c': { value: (input - 32) * 5/9, unit: '°C' },
+                'c-k': { value: input + 273.15, unit: 'K' },
+                'k-c': { value: input - 273.15, unit: '°C' },
+                'l-gal': { value: input * 0.264172, unit: 'gal' },
+                'gal-l': { value: input / 0.264172, unit: 'L' },
+                'ml-fl': { value: input * 0.033814, unit: 'fl oz' },
+                'fl-ml': { value: input / 0.033814, unit: 'ml' },
+                'mps-kmh': { value: input * 3.6, unit: 'km/h' },
+                'kmh-mps': { value: input / 3.6, unit: 'm/s' },
+                'kmh-mph': { value: input / 1.60934, unit: 'mph' },
+                'mph-kmh': { value: input * 1.60934, unit: 'km/h' }
+            };
+            
+            if (conversions[type]) {
+                result = conversions[type];
+                document.getElementById('conversionResult').textContent = 
+                    `${input} → ${result.value.toFixed(4)} ${result.unit}`;
+            }
+        }
+
+        // Gaming Conversions
+        function convertMinecraft() {
+            const blocks = parseFloat(document.getElementById('mcBlocks').value);
+            if (isNaN(blocks)) {
+                document.getElementById('mcResult').textContent = '0 meters';
+                return;
+            }
+            const meters = blocks; // 1 block = 1 meter in Minecraft
+            document.getElementById('mcResult').textContent = `${blocks} blocks = ${meters} meters`;
+        }
+
+        function convertDnD() {
+            const feet = parseFloat(document.getElementById('dndFeet').value);
+            if (isNaN(feet)) {
+                document.getElementById('dndResult').textContent = '0 squares';
+                return;
+            }
+            const squares = feet / 5; // 1 square = 5 feet
+            document.getElementById('dndResult').textContent = `${feet} feet = ${squares} squares (${(squares * 1.5).toFixed(1)} meters)`;
+        }
+
+        function calculateDamage() {
+            const baseDamage = parseFloat(document.getElementById('baseDamage').value);
+            const multiplier = parseFloat(document.getElementById('damageMultiplier').value);
+            
+            if (isNaN(baseDamage) || isNaN(multiplier)) {
+                document.getElementById('damageResult').textContent = '0 total damage';
+                return;
+            }
+            
+            const totalDamage = baseDamage * multiplier;
+            document.getElementById('damageResult').textContent = 
+                `${baseDamage} × ${multiplier} = ${totalDamage.toFixed(2)} damage`;
+        }
+
+        // Initialize
+        updateDateTime();
+        updateTemperature();
+        setInterval(updateDateTime, 1000);
+        setInterval(updateTemperature, 30000); // Update temp every 30 seconds
+    </script>
+</body>
+</html>
